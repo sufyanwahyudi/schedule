@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadwal Ach. Sufyan Wahyudi</title>
+    <title>Aplikasi Jadwal Ach. Sufyan Wahyudi</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -28,8 +28,6 @@
             --tag-kerja-txt: #1e40af;
             --tag-dosen-bg: #fef08a;
             --tag-dosen-txt: #854d0e;
-
-            --emoji-silver: grayscale(100%) brightness(1.2) contrast(1.1);
         }
 
         body.dark-mode {
@@ -53,8 +51,6 @@
             --tag-kerja-txt: #93c5fd;
             --tag-dosen-bg: #713f12;
             --tag-dosen-txt: #fde047;
-
-            --emoji-silver: grayscale(100%) brightness(1.8) contrast(1.2);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -277,6 +273,29 @@
         .time-row { display: flex; gap: 15px; }
         .time-row .input-group { flex: 1; }
 
+        /* Tombol Simpan di setiap panel edit */
+        .btn-simpan-jadwal {
+            width: 100%;
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 8px;
+            transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .btn-simpan-jadwal:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* --- MENU MELAYANG BAWAH --- */
         .bottom-nav {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             background: var(--header-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
@@ -296,8 +315,8 @@
         .nav-item:hover { background: var(--input-focus-bg); }
         .nav-item.active { background: var(--btn-bg); color: var(--btn-text); }
         
-        .nav-icon { font-size: 1.2rem; pointer-events: none; filter: var(--emoji-silver); transition: 0.4s; }
-        .action-icon { font-size: 1.2rem; pointer-events: none; filter: none; margin: 0 4px;}
+        .nav-icon { font-size: 1.2rem; pointer-events: none; filter: grayscale(100%); transition: 0.4s; }
+        .action-icon { font-size: 1.2rem; pointer-events: none; margin: 0 4px; filter: grayscale(100%); opacity: 0.9;}
         
         .nav-text { max-width: 0; opacity: 0; margin-left: 0; transition: 0.4s; white-space: nowrap; font-size: 0.75rem; pointer-events: none; }
         .nav-item.active .nav-text { max-width: 100px; opacity: 1; margin-left: 8px; }
@@ -305,6 +324,34 @@
         .nav-divider {
             width: 2px; background: var(--divider); margin: 5px; border-radius: 2px; flex-shrink: 0;
         }
+
+        /* --- HALAMAN MODAL BACKUP --- */
+        .modal-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); z-index: 9999;
+            align-items: center; justify-content: center; backdrop-filter: blur(3px);
+            animation: fadeInModal 0.2s ease;
+        }
+        @keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
+        
+        .modal-content {
+            background: var(--card-bg); padding: 25px; border-radius: 16px; 
+            width: 85%; max-width: 350px; display: flex; flex-direction: column; gap: 15px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2); border: 1px solid var(--divider);
+        }
+        
+        .modal-content h3 { font-size: 1.1rem; font-weight: 800; text-align: center; color: var(--text-primary); }
+        .modal-content p { font-size: 0.8rem; font-weight: 600; text-align: center; color: var(--text-secondary); margin-bottom: 5px; text-transform: none;}
+        
+        .modal-btn {
+            background: var(--input-focus-bg); border: 1px solid var(--divider); padding: 14px;
+            border-radius: 10px; font-weight: 800; color: var(--text-primary); cursor: pointer;
+            transition: 0.3s; font-family: inherit; font-size: 0.85rem; text-transform: uppercase;
+        }
+        .modal-btn:hover { border-color: var(--accent-color); }
+        .btn-cancel { background: #ef4444; color: #ffffff; border: none; margin-top: 10px; }
+        .btn-cancel:hover { background: #dc2626; }
 
         .sync-status {
             font-size: 0.7rem; font-weight: 800; color: var(--text-secondary);
@@ -372,13 +419,20 @@
         
         <div class="nav-divider"></div>
 
-        <button class="nav-item action-btn" id="exportBtn" title="Download Backup">
-            <span class="action-icon">💾</span>
-        </button>
-        <button class="nav-item action-btn" id="importBtn" title="Upload Backup">
-            <span class="action-icon">📂</span>
+        <button class="nav-item action-btn" id="openModalBtn" title="Menu Data">
+            <span class="action-icon">📁</span>
         </button>
     </nav>
+    
+    <div class="modal-overlay" id="backupModal">
+        <div class="modal-content">
+            <h3>PENGATURAN DATA</h3>
+            <p>Pilih aksi untuk menyimpan atau mengambil data cadangan jadwalmu.</p>
+            <button class="modal-btn" id="exportBtn">📥 Download Backup</button>
+            <button class="modal-btn" id="importBtn">📤 Upload Restore</button>
+            <button class="modal-btn btn-cancel" id="closeModalBtn">Tutup</button>
+        </div>
+    </div>
     
     <input type="file" id="importFile" style="display:none" accept=".json">
 
@@ -398,7 +452,6 @@
             const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
             const namaBulanSingkat = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
 
-            // Fungsi otomatis menentukan jam berdasarkan nama kegiatan
             function getDefaultTime(theme) {
                 let t = theme.toUpperCase();
                 if (t.includes("MORFOLOGI") || t.includes("SINTAKSIS") || t.includes("KEPENULISAN")) {
@@ -414,7 +467,7 @@
                     return { start: "09:30", end: "13:00" };
                 }
                 if (t.trim() !== "" && t !== "KOSONG") {
-                    return { start: "08:00", end: "" }; // Lainnya jam 08.00 selesai kosong
+                    return { start: "08:00", end: "" };
                 }
                 return { start: "", end: "" };
             }
@@ -537,6 +590,9 @@
                                     <input type="time" id="input-end-${d}" value="${dayData.end}">
                                 </div>
                             </div>
+                            
+                            <!-- Tombol Simpan Spesifik -->
+                            <button class="btn-simpan-jadwal" id="save-btn-${d}">💾 SIMPAN JADWAL</button>
                         </div>
                     `;
 
@@ -551,19 +607,12 @@
                     const inputStart = body.querySelector(`#input-start-${d}`);
                     const inputEnd = body.querySelector(`#input-end-${d}`);
                     const timeText = header.querySelector(`#time-text-${d}`);
+                    const saveBtn = body.querySelector(`#save-btn-${d}`);
 
                     header.addEventListener('click', () => { card.classList.toggle('open'); });
 
-                    // Auto set jam ketika mengetik kegiatan baru
-                    inputTheme.addEventListener('input', () => {
-                        let theme = inputTheme.value;
-                        let autoT = getDefaultTime(theme);
-                        if (autoT.start) inputStart.value = autoT.start;
-                        if (autoT.end !== undefined) inputEnd.value = autoT.end;
-                        syncAndSave();
-                    });
-
-                    function syncAndSave() {
+                    // Fungsi Update Tampilan Saja (Saat Mengetik)
+                    function updateDisplayOnly() {
                         let theme = inputTheme.value;
                         let cat = selectCat.value;
                         let start = inputStart.value;
@@ -574,6 +623,26 @@
                         badge.innerText = cat;
                         card.setAttribute('data-category', cat);
                         timeText.innerText = formatTimeDisplay(start, end);
+                    }
+
+                    inputTheme.addEventListener('input', () => {
+                        let theme = inputTheme.value;
+                        let autoT = getDefaultTime(theme);
+                        if (autoT.start) inputStart.value = autoT.start;
+                        if (autoT.end !== undefined) inputEnd.value = autoT.end;
+                        updateDisplayOnly();
+                    });
+
+                    selectCat.addEventListener('change', updateDisplayOnly);
+                    inputStart.addEventListener('input', updateDisplayOnly);
+                    inputEnd.addEventListener('input', updateDisplayOnly);
+
+                    // Aksi Tombol Simpan Jadwal (Sinkron & Tutup)
+                    saveBtn.addEventListener('click', () => {
+                        let theme = inputTheme.value;
+                        let cat = selectCat.value;
+                        let start = inputStart.value;
+                        let end = inputEnd.value;
 
                         if (!appData[dataKey]) appData[dataKey] = {};
                         appData[dataKey][d] = { theme, cat, start, end };
@@ -581,11 +650,10 @@
                         localStorage.setItem(DB_KEY, JSON.stringify(appData));
                         syncToCloud();
                         applyFilter();
-                    }
-
-                    selectCat.addEventListener('change', syncAndSave);
-                    inputStart.addEventListener('input', syncAndSave);
-                    inputEnd.addEventListener('input', syncAndSave);
+                        
+                        // Menutup kotak edit agar rapi setelah disimpan
+                        card.classList.remove('open');
+                    });
                 }
                 
                 applyFilter();
@@ -597,9 +665,15 @@
                 return 'cat-pribadi';
             }
 
+            const openModalBtn = document.getElementById('openModalBtn');
+            const backupModal = document.getElementById('backupModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
             const exportBtn = document.getElementById('exportBtn');
             const importBtn = document.getElementById('importBtn');
             const importFile = document.getElementById('importFile');
+
+            openModalBtn.addEventListener('click', () => { backupModal.style.display = 'flex'; });
+            closeModalBtn.addEventListener('click', () => { backupModal.style.display = 'none'; });
 
             exportBtn.addEventListener('click', () => {
                 const data = JSON.stringify(appData);
@@ -610,9 +684,13 @@
                 a.download = `Backup_Jadwal_Sufyan_${yearInput.value}_${monthSelect.value}.json`;
                 a.click();
                 URL.revokeObjectURL(url);
+                backupModal.style.display = 'none'; 
             });
 
-            importBtn.addEventListener('click', () => { importFile.click(); });
+            importBtn.addEventListener('click', () => {
+                importFile.click();
+                backupModal.style.display = 'none'; 
+            });
 
             importFile.addEventListener('change', (e) => {
                 const file = e.target.files[0];
