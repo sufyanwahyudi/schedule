@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Schedule Ach. Sufyan Wahyudi</title>
+    <title>Aplikasi Jadwal Ach. Sufyan Wahyudi</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -26,7 +26,7 @@
             --tag-pribadi-txt: #166534;
             --tag-kerja-bg: #dbeafe;
             --tag-kerja-txt: #1e40af;
-            --tag-dose -bg: #fef08a;
+            --tag-dosen-bg: #fef08a;
             --tag-dosen-txt: #854d0e;
 
             --emoji-silver: grayscale(100%) brightness(1.2) contrast(1.1);
@@ -72,7 +72,6 @@
             text-transform: uppercase;
         }
 
-        /* --- HEADER & KONTROL WAKTU --- */
         .header-sticky {
             position: sticky;
             top: 0;
@@ -192,7 +191,6 @@
         }
         .theme-btn:hover { opacity: 0.9; }
 
-        /* --- KONTAINER JADWAL --- */
         #schedule-container {
             width: 100%;
             max-width: 800px;
@@ -257,7 +255,6 @@
         }
         .schedule-item.open .toggle-icon { transform: rotate(180deg); }
 
-        /* --- BODY KARTU (Panel Pengaturan Dalam) --- */
         .item-body {
             display: none; padding: 20px; border-top: 1px solid var(--divider); background: var(--hour-bg);
         }
@@ -280,7 +277,6 @@
         .time-row { display: flex; gap: 15px; }
         .time-row .input-group { flex: 1; }
 
-        /* --- MENU MELAYANG BAWAH --- */
         .bottom-nav {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             background: var(--header-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
@@ -329,7 +325,7 @@
 
     <header class="header-sticky">
         <div class="header-top">
-            <h1 class="tagline">Ach. Sufyan Wahyudi</h1>
+            <h1 class="tagline">Schedule Ach. Sufyan Wahyudi</h1>
             <button class="theme-btn" id="themeToggle">
                 <span id="t-icon" class="nav-icon" style="filter:none; font-size:1rem; margin-right:4px;">🌙</span> GELAP
             </button>
@@ -370,16 +366,16 @@
         <button class="nav-item filter-btn" data-filter="Pekerjaan">
             <span class="nav-icon">💼</span><span class="nav-text">Kerja</span>
         </button>
-        <button class="nav-item filter-btn" data-filter="Kuliah">
+        <button class="nav-item filter-btn" data-filter="Dosen">
             <span class="nav-icon">🎓</span><span class="nav-text">Dosen</span>
         </button>
         
         <div class="nav-divider"></div>
 
-        <button class="nav-item filter-btn" id="exportBtn" title="Backup">
+        <button class="nav-item action-btn" id="exportBtn" title="Download Backup">
             <span class="action-icon">💾</span>
         </button>
-        <button class="nav-item filter-btn" id="importBtn" title="Restore">
+        <button class="nav-item action-btn" id="importBtn" title="Upload Backup">
             <span class="action-icon">📂</span>
         </button>
     </nav>
@@ -391,7 +387,6 @@
             const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwatoHApZ7ffMhLJjkd5uKnzH5_dz7j2aNRnAnACjoOVAhzI6w0omnJ95zce8e7VttEnw/exec";
             const DB_KEY = 'app_jadwal_hybrid_v1';
             
-            // Muat instan dari memori HP agar tidak pernah loading macet
             let appData = JSON.parse(localStorage.getItem(DB_KEY)) || {};
 
             const container = document.getElementById('schedule-container');
@@ -403,13 +398,34 @@
             const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
             const namaBulanSingkat = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
 
-            const prefilledSep2026 = [
+            // Fungsi otomatis menentukan jam berdasarkan nama kegiatan
+            function getDefaultTime(theme) {
+                let t = theme.toUpperCase();
+                if (t.includes("MORFOLOGI") || t.includes("SINTAKSIS") || t.includes("KEPENULISAN")) {
+                    return { start: "07:30", end: "13:00" };
+                }
+                if (t.includes("DISPORA")) {
+                    return { start: "08:00", end: "14:00" };
+                }
+                if (t.includes("KULIAH UMUM")) {
+                    return { start: "09:00", end: "13:00" };
+                }
+                if (t.includes("PEMATERI SEMINAR")) {
+                    return { start: "09:30", end: "13:00" };
+                }
+                if (t.trim() !== "" && t !== "KOSONG") {
+                    return { start: "08:00", end: "" }; // Lainnya jam 08.00 selesai kosong
+                }
+                return { start: "", end: "" };
+            }
+
+            const rawSep2026 = [
                 { theme: "DESIGN GRAFIS DISPORA", cat: "Pribadi" }, { theme: "MORFOLOGI UNIKAMA", cat: "Dosen" },
                 { theme: "SINTAKSIS UNIKAMA", cat: "Dosen" }, { theme: "KEPENULISAN UNIKAMA", cat: "Dosen" },
                 { theme: "KOSONG", cat: "Pribadi" }, { theme: "RAPAT KOORDINASI TULISANMANUSIA", cat: "Pekerjaan" },
                 { theme: "KOSONG", cat: "Pribadi" }, { theme: "KOSONG", cat: "Pribadi" },
                 { theme: "MORFOLOGI UNIKAMA", cat: "Dosen" }, { theme: "SINTAKSIS UNIKAMA", cat: "Dosen" },
-                { theme: "KEPENULISAN UNIKAMA", cat: "Dosen" }, { theme: "RAPAT KOORDINASI TULISANMANUSIA", cat: "Pekerjaan" },
+                { theme: "KEPENULISAN UNIKAMA", cat: "Dosen" }, { theme: "RAPAT KOORDINASI TULISANMANUSIA", cat: "Pribadi" },
                 { theme: "PEMATERI SEMINAR KEBANGSAAN UM", cat: "Pekerjaan" }, { theme: "PERTEMUAN INVESTOR TULISANMANUSIA", cat: "Pekerjaan" },
                 { theme: "KOSONG", cat: "Pribadi" }, { theme: "PERTEMUAN DISPORA", cat: "Pribadi" },
                 { theme: "SINTAKSIS UNIKAMA", cat: "Dosen" }, { theme: "KEPENULISAN UNIKAMA", cat: "Dosen" },
@@ -421,11 +437,15 @@
                 { theme: "RAPAT HASIL KANDIDAT", cat: "Pekerjaan" }, { theme: "MORFOLOGI UNIKAMA", cat: "Dosen" }
             ];
 
+            const prefilledSep2026 = rawSep2026.map(item => {
+                let t = getDefaultTime(item.theme);
+                return { theme: item.theme, cat: item.cat, start: t.start, end: t.end };
+            });
+
             let today = new Date();
             monthSelect.value = today.getMonth() + 1;
             yearInput.value = today.getFullYear();
 
-            // Fungsi Kirim Data ke Google Sheets secara senyap di latar belakang
             function syncToCloud() {
                 syncStatus.innerText = "MENCADANGKAN KE GOOGLE SHEETS...";
                 fetch(SCRIPT_URL, {
@@ -462,7 +482,7 @@
                 if (isSep2026 && Object.keys(appData[dataKey]).length === 0) {
                     for(let i=0; i<30; i++) {
                         appData[dataKey][i+1] = { 
-                            theme: prefilledSep2026[i].theme, cat: prefilledSep2026[i].cat, start: "", end: "" 
+                            theme: prefilledSep2026[i].theme, cat: prefilledSep2026[i].cat, start: prefilledSep2026[i].start, end: prefilledSep2026[i].end 
                         };
                     }
                 }
@@ -534,6 +554,15 @@
 
                     header.addEventListener('click', () => { card.classList.toggle('open'); });
 
+                    // Auto set jam ketika mengetik kegiatan baru
+                    inputTheme.addEventListener('input', () => {
+                        let theme = inputTheme.value;
+                        let autoT = getDefaultTime(theme);
+                        if (autoT.start) inputStart.value = autoT.start;
+                        if (autoT.end !== undefined) inputEnd.value = autoT.end;
+                        syncAndSave();
+                    });
+
                     function syncAndSave() {
                         let theme = inputTheme.value;
                         let cat = selectCat.value;
@@ -549,14 +578,12 @@
                         if (!appData[dataKey]) appData[dataKey] = {};
                         appData[dataKey][d] = { theme, cat, start, end };
                         
-                        // Simpan instan di HP & kirim ke Google Sheets di latar belakang
                         localStorage.setItem(DB_KEY, JSON.stringify(appData));
                         syncToCloud();
                         applyFilter();
                     }
 
                     selectCat.addEventListener('change', syncAndSave);
-                    inputTheme.addEventListener('input', syncAndSave);
                     inputStart.addEventListener('input', syncAndSave);
                     inputEnd.addEventListener('input', syncAndSave);
                 }
@@ -566,11 +593,10 @@
 
             function getCatClass(val) {
                 if(val === 'Pekerjaan') return 'cat-pekerjaan';
-                if(val === 'Kuliah') return 'cat-kuliah';
+                if(val === 'Dosen') return 'cat-dosen';
                 return 'cat-pribadi';
             }
 
-            // --- FITUR BACKUP & RESTORE --- //
             const exportBtn = document.getElementById('exportBtn');
             const importBtn = document.getElementById('importBtn');
             const importFile = document.getElementById('importFile');
@@ -613,7 +639,6 @@
                 importFile.value = ''; 
             });
 
-            // --- PENCARIAN & FILTER --- //
             const filterBtns = document.querySelectorAll('.filter-btn');
             let currentFilter = 'All';
 
@@ -649,7 +674,6 @@
             monthSelect.addEventListener('change', renderCalendar);
             yearInput.addEventListener('change', renderCalendar);
 
-            // --- TEMA GELAP / TERANG --- //
             const btnTheme = document.getElementById('themeToggle');
             
             function updateThemeBtn() {
@@ -671,7 +695,6 @@
                 localStorage.setItem('app_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
             });
 
-            // Render langsung tanpa menunggu internet macet
             renderCalendar();
         });
     </script>
