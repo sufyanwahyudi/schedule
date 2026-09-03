@@ -26,8 +26,8 @@
             --tag-pribadi-txt: #166534;
             --tag-kerja-bg: #dbeafe;
             --tag-kerja-txt: #1e40af;
-            --tag-kuliah-bg: #fef08a;
-            --tag-kuliah-txt: #854d0e;
+            --tag-dose -bg: #fef08a;
+            --tag-dosen-txt: #854d0e;
 
             --emoji-silver: grayscale(100%) brightness(1.2) contrast(1.1);
         }
@@ -51,8 +51,8 @@
             --tag-pribadi-txt: #86efac;
             --tag-kerja-bg: #1e3a8a;
             --tag-kerja-txt: #93c5fd;
-            --tag-kuliah-bg: #713f12;
-            --tag-kuliah-txt: #fde047;
+            --tag-dosen-bg: #713f12;
+            --tag-dosen-txt: #fde047;
 
             --emoji-silver: grayscale(100%) brightness(1.8) contrast(1.2);
         }
@@ -371,7 +371,7 @@
             <span class="nav-icon">💼</span><span class="nav-text">Kerja</span>
         </button>
         <button class="nav-item filter-btn" data-filter="Kuliah">
-            <span class="nav-icon">🎓</span><span class="nav-text">Kuliah</span>
+            <span class="nav-icon">🎓</span><span class="nav-text">Dosen</span>
         </button>
         
         <div class="nav-divider"></div>
@@ -404,21 +404,21 @@
             const namaBulanSingkat = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
 
             const prefilledSep2026 = [
-                { theme: "DESIGN GRAFIS DISPORA", cat: "Pribadi" }, { theme: "MORFOLOGI UNIKAMA", cat: "Kuliah" },
-                { theme: "SINTAKSIS UNIKAMA", cat: "Kuliah" }, { theme: "KEPENULISAN UNIKAMA", cat: "Kuliah" },
+                { theme: "DESIGN GRAFIS DISPORA", cat: "Pribadi" }, { theme: "MORFOLOGI UNIKAMA", cat: "Dosen" },
+                { theme: "SINTAKSIS UNIKAMA", cat: "Dosen" }, { theme: "KEPENULISAN UNIKAMA", cat: "Dosen" },
                 { theme: "KOSONG", cat: "Pribadi" }, { theme: "RAPAT KOORDINASI TULISANMANUSIA", cat: "Pekerjaan" },
                 { theme: "KOSONG", cat: "Pribadi" }, { theme: "KOSONG", cat: "Pribadi" },
-                { theme: "MORFOLOGI UNIKAMA", cat: "Kuliah" }, { theme: "SINTAKSIS UNIKAMA", cat: "Kuliah" },
-                { theme: "KEPENULISAN UNIKAMA", cat: "Kuliah" }, { theme: "RAPAT KOORDINASI TULISANMANUSIA", cat: "Pribadi" },
+                { theme: "MORFOLOGI UNIKAMA", cat: "Dosen" }, { theme: "SINTAKSIS UNIKAMA", cat: "Dosen" },
+                { theme: "KEPENULISAN UNIKAMA", cat: "Dosen" }, { theme: "RAPAT KOORDINASI TULISANMANUSIA", cat: "Pekerjaan" },
                 { theme: "PEMATERI SEMINAR KEBANGSAAN UM", cat: "Pekerjaan" }, { theme: "PERTEMUAN INVESTOR TULISANMANUSIA", cat: "Pekerjaan" },
                 { theme: "KOSONG", cat: "Pribadi" }, { theme: "PERTEMUAN DISPORA", cat: "Pribadi" },
-                { theme: "SINTAKSIS UNIKAMA", cat: "Kuliah" }, { theme: "KEPENULISAN UNIKAMA", cat: "Kuliah" },
-                { theme: "MORFOLOGI UNIKAMA", cat: "Kuliah" }, { theme: "KOSONG", cat: "Pribadi" },
+                { theme: "SINTAKSIS UNIKAMA", cat: "Dosen" }, { theme: "KEPENULISAN UNIKAMA", cat: "Dosen" },
+                { theme: "MORFOLOGI UNIKAMA", cat: "Dosen" }, { theme: "KOSONG", cat: "Pribadi" },
                 { theme: "KOSONG", cat: "Pribadi" }, { theme: "KOSONG", cat: "Pribadi" },
-                { theme: "MORFOLOGI UNIKAMA", cat: "Kuliah" }, { theme: "SINTAKSIS UNIKAMA", cat: "Kuliah" },
-                { theme: "KEPENULISAN UNIKAMA", cat: "Kuliah" }, { theme: "GROUP KANDIDAT FREELANCE", cat: "Pekerjaan" },
+                { theme: "MORFOLOGI UNIKAMA", cat: "Dosen" }, { theme: "SINTAKSIS UNIKAMA", cat: "Dosen" },
+                { theme: "KEPENULISAN UNIKAMA", cat: "Dosen" }, { theme: "GROUP KANDIDAT FREELANCE", cat: "Pekerjaan" },
                 { theme: "RAPAT INTERVIEW KANDIDAT TULISANMANUSIA", cat: "Pekerjaan" }, { theme: "INTERVIEW FREELANCE", cat: "Pekerjaan" },
-                { theme: "RAPAT HASIL KANDIDAT", cat: "Pekerjaan" }, { theme: "MORFOLOGI UNIKAMA", cat: "Kuliah" }
+                { theme: "RAPAT HASIL KANDIDAT", cat: "Pekerjaan" }, { theme: "MORFOLOGI UNIKAMA", cat: "Dosen" }
             ];
 
             let today = new Date();
@@ -504,7 +504,7 @@
                                 <select id="select-cat-${d}">
                                     <option value="Pribadi" ${dayData.cat === 'Pribadi' ? 'selected' : ''}>Pribadi</option>
                                     <option value="Pekerjaan" ${dayData.cat === 'Pekerjaan' ? 'selected' : ''}>Pekerjaan</option>
-                                    <option value="Kuliah" ${dayData.cat === 'Kuliah' ? 'selected' : ''}>Kuliah</option>
+                                    <option value="Dosen" ${dayData.cat === 'Dosen' ? 'selected' : ''}>Dosen</option>
                                 </select>
                             </div>
                             <div class="time-row">
