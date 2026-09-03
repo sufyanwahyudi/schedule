@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Jadwal Ach. Sufyan Wahyudi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-body: linear-gradient(135deg, #fdfcfb 0%, #f3f4f6 100%);
+            --header-bg: rgba(253, 252, 251, 0.85);
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --accent-color: #4b5563;
+            --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+            --hover-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+            --input-focus-bg: #f8fafc;
+            --btn-bg: #1f2937;
+            --btn-text: #ffffff;
+            --divider: #e5e7eb;
+            --hour-bg: #f9fafb;
+            
+            --tag-pribadi-bg: #dcfce7;
+            --tag-pribadi-txt: #166534;
+            --tag-kerja-bg: #dbeafe;
+            --tag-kerja-txt: #1e40af;
+            --tag-kuliah-bg: #fef08a;
+            --tag-kuliah-txt: #854d0e;
+
+            --emoji-silver: grayscale(100%) brightness(1.2) contrast(1.1);
+        }
+
+        body.dark-mode {
+            --bg-body: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --header-bg: rgba(15, 23, 42, 0.85);
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #94a3b8;
+            --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            --hover-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            --input-focus-bg: #0f172a;
+            --btn-bg: #f8fafc;
+            --btn-text: #0f172a;
+            --divider: #334155;
+            --hour-bg: #0f172a;
+
+            --tag-pribadi-bg: #14532d;
+            --tag-pribadi-txt: #86efac;
+            --tag-kerja-bg: #1e3a8a;
+            --tag-kerja-txt: #93c5fd;
+            --tag-kuliah-bg: #713f12;
+            --tag-kuliah-txt: #fde047;
+
+            --emoji-silver: grayscale(100%) brightness(1.8) contrast(1.2);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 120px;
+            transition: background 0.4s ease;
+            text-transform: uppercase;
+        }
+
+        /* --- HEADER & KONTROL WAKTU --- */
+        .header-sticky {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            background: var(--header-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 999;
+            border-bottom: 1px solid var(--divider);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 24px;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .header-top {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .tagline::before {
+            content: '';
+            width: 5px; height: 18px;
+            background-color: var(--accent-color);
+            border-radius: 4px;
+        }
+
+        .controls-wrapper {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        @media (min-width: 600px) {
+            .controls-wrapper {
+                flex-direction: row;
+                align-items: center;
+            }
+        }
+
+        .time-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .custom-select, .custom-input {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--divider);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            outline: none;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: 0.3s;
+        }
+        
+        .custom-input { width: 90px; cursor: text; }
+        .custom-select:focus, .custom-input:focus { border-color: var(--accent-color); }
+
+        .search-input {
+            flex-grow: 1;
+            background: var(--input-focus-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--divider);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            outline: none;
+            transition: 0.3s;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .search-input::placeholder { color: var(--text-secondary); opacity: 0.7; }
+        .search-input:focus { border-color: var(--accent-color); background: var(--card-bg); }
+
+        .theme-btn {
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.8rem;
+            font-family: inherit;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: opacity 0.3s;
+        }
+        .theme-btn:hover { opacity: 0.9; }
+
+        /* --- KONTAINER JADWAL --- */
+        #schedule-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding: 0 20px;
+        }
+
+        .schedule-item {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--divider);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .schedule-item:hover { box-shadow: var(--hover-shadow); }
+
+        .item-header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            transition: border 0.3s, background 0.3s;
+        }
+        .schedule-item:hover .item-header { border-left-color: var(--accent-color); }
+        .schedule-item.open .item-header { background: var(--input-focus-bg); border-left-color: var(--accent-color); }
+
+        .date-box { min-width: 90px; display: flex; flex-direction: column; }
+        .d-num { font-weight: 800; font-size: 1.1rem; }
+        .d-day { font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; margin-top: 2px;}
+
+        .cat-badge {
+            padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-align: center; min-width: 85px;
+        }
+        .cat-pribadi { background: var(--tag-pribadi-bg); color: var(--tag-pribadi-txt); }
+        .cat-pekerjaan { background: var(--tag-kerja-bg); color: var(--tag-kerja-txt); }
+        .cat-kuliah { background: var(--tag-kuliah-bg); color: var(--tag-kuliah-txt); }
+
+        .activity-info {
+            flex-grow: 1; display: flex; flex-direction: column; gap: 4px; overflow: hidden;
+        }
+
+        .theme-display {
+            font-weight: 700; font-size: 0.95rem; color: var(--text-primary);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 4px 0;
+        }
+        .theme-display:empty::before {
+            content: 'KOSONG (KLIK UNTUK MENGISI)'; color: var(--text-secondary); font-weight: 500; opacity: 0.6;
+        }
+
+        .time-display {
+            font-size: 0.75rem; font-weight: 800; color: var(--text-secondary);
+            display: flex; align-items: center; gap: 5px;
+        }
+
+        .toggle-icon {
+            font-size: 0.8rem; color: var(--text-secondary); transition: transform 0.3s; font-weight: 800; padding-left: 10px;
+        }
+        .schedule-item.open .toggle-icon { transform: rotate(180deg); }
+
+        /* --- BODY KARTU (Panel Pengaturan Dalam) --- */
+        .item-body {
+            display: none; padding: 20px; border-top: 1px solid var(--divider); background: var(--hour-bg);
+        }
+        .schedule-item.open .item-body { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .settings-panel {
+            background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--divider); display: flex; flex-direction: column; gap: 12px;
+        }
+        .settings-panel label { font-size: 0.75rem; font-weight: 800; color: var(--text-secondary); }
+        
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group input, .input-group select {
+            width: 100%; background: var(--input-focus-bg); border: 1px solid var(--divider);
+            color: var(--text-primary); padding: 10px 12px; border-radius: 6px; font-family: inherit;
+            font-weight: 700; font-size: 0.9rem; outline: none; text-transform: uppercase;
+        }
+        .input-group input[type="time"] { text-align: center; }
+        .input-group input:focus, .input-group select:focus { border-color: var(--accent-color); }
+        .time-row { display: flex; gap: 15px; }
+        .time-row .input-group { flex: 1; }
+
+        /* --- MENU MELAYANG BAWAH --- */
+        .bottom-nav {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--header-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            padding: 8px 12px; border-radius: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex; gap: 5px; border: 1px solid var(--divider); z-index: 1000;
+            max-width: 95vw; overflow-x: auto;
+            -ms-overflow-style: none; scrollbar-width: none;
+        }
+        .bottom-nav::-webkit-scrollbar { display: none; }
+        body.dark-mode .bottom-nav { box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .nav-item {
+            display: flex; align-items: center; padding: 10px; border-radius: 30px; cursor: pointer;
+            background: transparent; border: none; color: var(--text-primary); font-family: inherit;
+            font-weight: 700; transition: 0.4s; overflow: hidden; text-transform: uppercase; flex-shrink: 0;
+        }
+        .nav-item:hover { background: var(--input-focus-bg); }
+        .nav-item.active { background: var(--btn-bg); color: var(--btn-text); }
+        
+        .nav-icon { font-size: 1.2rem; pointer-events: none; filter: var(--emoji-silver); transition: 0.4s; }
+        .action-icon { font-size: 1.2rem; pointer-events: none; filter: none; margin: 0 4px;}
+        
+        .nav-text { max-width: 0; opacity: 0; margin-left: 0; transition: 0.4s; white-space: nowrap; font-size: 0.75rem; pointer-events: none; }
+        .nav-item.active .nav-text { max-width: 100px; opacity: 1; margin-left: 8px; }
+
+        .nav-divider {
+            width: 2px; background: var(--divider); margin: 5px; border-radius: 2px; flex-shrink: 0;
+        }
+
+        .sync-status {
+            font-size: 0.7rem; font-weight: 800; color: var(--text-secondary);
+            text-align: center; margin-top: 10px; letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 600px) {
+            .header-sticky { padding: 12px 16px; gap: 10px; }
+            .header-top { flex-direction: row; }
+            .theme-btn { font-size: 0.75rem; padding: 8px 12px; }
+            .item-header { flex-wrap: wrap; gap: 10px; padding: 14px 16px; }
+            .activity-info { order: 3; width: 100%; border-top: 1px dashed var(--divider); padding-top: 10px; margin-top: 5px;}
+            .date-box { flex-grow: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-sticky">
+        <div class="header-top">
+            <h1 class="tagline">Schedule Ach. Sufyan Wahyudi</h1>
+            <button class="theme-btn" id="themeToggle">
+                <span id="t-icon" class="nav-icon" style="filter:none; font-size:1rem; margin-right:4px;">🌙</span> GELAP
+            </button>
+        </div>
+        
+        <div class="controls-wrapper">
+            <div class="time-controls">
+                <select id="monthSelect" class="custom-select">
+                    <option value="1">Januari</option>
+                    <option value="2">Februari</option>
+                    <option value="3">Maret</option>
+                    <option value="4">April</option>
+                    <option value="5">Mei</option>
+                    <option value="6">Juni</option>
+                    <option value="7">Juli</option>
+                    <option value="8">Agustus</option>
+                    <option value="9">September</option>
+                    <option value="10">Oktober</option>
+                    <option value="11">November</option>
+                    <option value="12">Desember</option>
+                </select>
+                <input type="number" id="yearInput" class="custom-input" min="2000" max="2100" value="2026">
+            </div>
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cari tanggal, hari, kegiatan...">
+        </div>
+    </header>
+
+    <main id="schedule-container"></main>
+    <div class="sync-status" id="syncStatus">SIAP DIGUNAKAN (TERHUBUNG KE GOOGLE SHEETS)</div>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active filter-btn" data-filter="All">
+            <span class="nav-icon">🏠</span><span class="nav-text">Beranda</span>
+        </button>
+        <button class="nav-item filter-btn" data-filter="Pribadi">
+            <span class="nav-icon">👤</span><span class="nav-text">Pribadi</span>
+        </button>
+        <button class="nav-item filter-btn" data-filter="Pekerjaan">
+            <span class="nav-icon">💼</span><span class="nav-text">Kerja</span>
+        </button>
+        <button class="nav-item filter-btn" data-filter="Kuliah">
+            <span class="nav-icon">🎓</span><span class="nav-text">Kuliah</span>
+        </button>
+        
+        <div class="nav-divider"></div>
+
+        <button class="nav-item action-btn" id="exportBtn" title="Download Backup">
+            <span class="action-icon">💾</span>
+        </button>
+        <button class="nav-item action-btn" id="importBtn" title="Upload Backup">
+            <span class="action-icon">📂</span>
+        </button>
+    </nav>
+    
+    <input type="file" id="importFile" style="display:none" accept=".json">
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwatoHApZ7ffMhLJjkd5uKnzH5_dz7j2aNRnAnACjoOVAhzI6w0omnJ95zce8e7VttEnw/exec";
+            const DB_KEY = 'app_jadwal_hybrid_v1';
+            
+            // Muat instan dari memori HP agar tidak pernah loading macet
+            let appData = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+
+            const container = document.getElementById('schedule-container');
+            const monthSelect = document.getElementById('monthSelect');
+            const yearInput = document.getElementById('yearInput');
+            const searchInput = document.getElementById('searchInput');
+            const syncStatus = document.getElementById('syncStatus');
+            
+            const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+            const namaBulanSingkat = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+
+            const prefilledSep2026 = [
+                { theme: "DESIGN GRAFIS DISPORA", cat: "Pribadi" }, { theme: "MORFOLOGI UNIKAMA", cat: "Kuliah" },
+                { theme: "SINTAKSIS UNIKAMA", cat: "Kuliah" }, { theme: "KEPENULISAN UNIKAMA", cat: "Kuliah" },
+                { theme: "KOSONG", cat: "Pribadi" }, { theme: "RAPAT KOORDINASI TULISANMANUSIA", cat: "Pekerjaan" },
+                { theme: "KOSONG", cat: "Pribadi" }, { theme: "KOSONG", cat: "Pribadi" },
+                { theme: "MORFOLOGI UNIKAMA", cat: "Kuliah" }, { theme: "SINTAKSIS UNIKAMA", cat: "Kuliah" },
+                { theme: "KEPENULISAN UNIKAMA", cat: "Kuliah" }, { theme: "RAPAT KOORDINASI TULISANMANUSIA", cat: "Pribadi" },
+                { theme: "PEMATERI SEMINAR KEBANGSAAN UM", cat: "Pekerjaan" }, { theme: "PERTEMUAN INVESTOR TULISANMANUSIA", cat: "Pekerjaan" },
+                { theme: "KOSONG", cat: "Pribadi" }, { theme: "PERTEMUAN DISPORA", cat: "Pribadi" },
+                { theme: "SINTAKSIS UNIKAMA", cat: "Kuliah" }, { theme: "KEPENULISAN UNIKAMA", cat: "Kuliah" },
+                { theme: "MORFOLOGI UNIKAMA", cat: "Kuliah" }, { theme: "KOSONG", cat: "Pribadi" },
+                { theme: "KOSONG", cat: "Pribadi" }, { theme: "KOSONG", cat: "Pribadi" },
+                { theme: "MORFOLOGI UNIKAMA", cat: "Kuliah" }, { theme: "SINTAKSIS UNIKAMA", cat: "Kuliah" },
+                { theme: "KEPENULISAN UNIKAMA", cat: "Kuliah" }, { theme: "GROUP KANDIDAT FREELANCE", cat: "Pekerjaan" },
+                { theme: "RAPAT INTERVIEW KANDIDAT TULISANMANUSIA", cat: "Pekerjaan" }, { theme: "INTERVIEW FREELANCE", cat: "Pekerjaan" },
+                { theme: "RAPAT HASIL KANDIDAT", cat: "Pekerjaan" }, { theme: "MORFOLOGI UNIKAMA", cat: "Kuliah" }
+            ];
+
+            let today = new Date();
+            monthSelect.value = today.getMonth() + 1;
+            yearInput.value = today.getFullYear();
+
+            // Fungsi Kirim Data ke Google Sheets secara senyap di latar belakang
+            function syncToCloud() {
+                syncStatus.innerText = "MENCADANGKAN KE GOOGLE SHEETS...";
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(appData)
+                }).then(() => {
+                    syncStatus.innerText = "TERCANDANG AMAN DI GOOGLE SHEETS";
+                }).catch(() => {
+                    syncStatus.innerText = "TERTUNDA (OFFLINE MODE)";
+                });
+            }
+
+            function formatTimeDisplay(start, end) {
+                if (!start && !end) return "BELUM ADA JAM";
+                if (start && !end) return `${start} - SELESAI`;
+                if (!start && end) return `HINGGA ${end}`;
+                return `${start} - ${end}`;
+            }
+
+            function renderCalendar() {
+                let m = parseInt(monthSelect.value);
+                let y = parseInt(yearInput.value);
+                let dataKey = `${y}-${m}`;
+
+                container.innerHTML = '';
+                let totalDays = new Date(y, m, 0).getDate();
+                let startDay = new Date(y, m - 1, 1).getDay(); 
+
+                if (!appData[dataKey]) appData[dataKey] = {};
+
+                let isSep2026 = (y === 2026 && m === 9);
+                if (isSep2026 && Object.keys(appData[dataKey]).length === 0) {
+                    for(let i=0; i<30; i++) {
+                        appData[dataKey][i+1] = { 
+                            theme: prefilledSep2026[i].theme, cat: prefilledSep2026[i].cat, start: "", end: "" 
+                        };
+                    }
+                }
+
+                for (let d = 1; d <= totalDays; d++) {
+                    let dayOfWeek = namaHari[(startDay + d - 1) % 7];
+                    let monthStr = namaBulanSingkat[m - 1];
+                    let dayData = appData[dataKey][d] || { theme: "", cat: "Pribadi", start: "", end: "" };
+
+                    const card = document.createElement('div');
+                    card.className = 'schedule-item';
+                    card.setAttribute('data-category', dayData.cat);
+                    
+                    const header = document.createElement('div');
+                    header.className = 'item-header';
+                    header.innerHTML = `
+                        <div class="date-box">
+                            <div class="d-num">${d} ${monthStr}</div>
+                            <div class="d-day">${dayOfWeek}</div>
+                        </div>
+                        <div class="cat-badge ${getCatClass(dayData.cat)}" id="badge-${d}">${dayData.cat}</div>
+                        <div class="activity-info">
+                            <div class="theme-display" id="display-${d}">${dayData.theme}</div>
+                            <div class="time-display" id="time-${d}">🕒 <span id="time-text-${d}">${formatTimeDisplay(dayData.start, dayData.end)}</span></div>
+                        </div>
+                        <div class="toggle-icon">▼</div>
+                    `;
+
+                    const body = document.createElement('div');
+                    body.className = 'item-body';
+                    body.innerHTML = `
+                        <div class="settings-panel">
+                            <div class="input-group">
+                                <label>NAMA KEGIATAN UTAMA</label>
+                                <input type="text" id="input-theme-${d}" value="${dayData.theme}" placeholder="Ketik kegiatan utama...">
+                            </div>
+                            <div class="input-group">
+                                <label>KATEGORI KEGIATAN</label>
+                                <select id="select-cat-${d}">
+                                    <option value="Pribadi" ${dayData.cat === 'Pribadi' ? 'selected' : ''}>Pribadi</option>
+                                    <option value="Pekerjaan" ${dayData.cat === 'Pekerjaan' ? 'selected' : ''}>Pekerjaan</option>
+                                    <option value="Kuliah" ${dayData.cat === 'Kuliah' ? 'selected' : ''}>Kuliah</option>
+                                </select>
+                            </div>
+                            <div class="time-row">
+                                <div class="input-group">
+                                    <label>JAM MULAI</label>
+                                    <input type="time" id="input-start-${d}" value="${dayData.start}">
+                                </div>
+                                <div class="input-group">
+                                    <label>JAM SELESAI</label>
+                                    <input type="time" id="input-end-${d}" value="${dayData.end}">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    card.appendChild(header);
+                    card.appendChild(body);
+                    container.appendChild(card);
+
+                    const selectCat = body.querySelector(`#select-cat-${d}`);
+                    const badge = header.querySelector(`#badge-${d}`);
+                    const inputTheme = body.querySelector(`#input-theme-${d}`);
+                    const displayTheme = header.querySelector(`#display-${d}`);
+                    const inputStart = body.querySelector(`#input-start-${d}`);
+                    const inputEnd = body.querySelector(`#input-end-${d}`);
+                    const timeText = header.querySelector(`#time-text-${d}`);
+
+                    header.addEventListener('click', () => { card.classList.toggle('open'); });
+
+                    function syncAndSave() {
+                        let theme = inputTheme.value;
+                        let cat = selectCat.value;
+                        let start = inputStart.value;
+                        let end = inputEnd.value;
+
+                        displayTheme.innerText = theme;
+                        badge.className = `cat-badge ${getCatClass(cat)}`;
+                        badge.innerText = cat;
+                        card.setAttribute('data-category', cat);
+                        timeText.innerText = formatTimeDisplay(start, end);
+
+                        if (!appData[dataKey]) appData[dataKey] = {};
+                        appData[dataKey][d] = { theme, cat, start, end };
+                        
+                        // Simpan instan di HP & kirim ke Google Sheets di latar belakang
+                        localStorage.setItem(DB_KEY, JSON.stringify(appData));
+                        syncToCloud();
+                        applyFilter();
+                    }
+
+                    selectCat.addEventListener('change', syncAndSave);
+                    inputTheme.addEventListener('input', syncAndSave);
+                    inputStart.addEventListener('input', syncAndSave);
+                    inputEnd.addEventListener('input', syncAndSave);
+                }
+                
+                applyFilter();
+            }
+
+            function getCatClass(val) {
+                if(val === 'Pekerjaan') return 'cat-pekerjaan';
+                if(val === 'Kuliah') return 'cat-kuliah';
+                return 'cat-pribadi';
+            }
+
+            // --- FITUR BACKUP & RESTORE --- //
+            const exportBtn = document.getElementById('exportBtn');
+            const importBtn = document.getElementById('importBtn');
+            const importFile = document.getElementById('importFile');
+
+            exportBtn.addEventListener('click', () => {
+                const data = JSON.stringify(appData);
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Backup_Jadwal_Sufyan_${yearInput.value}_${monthSelect.value}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+
+            importBtn.addEventListener('click', () => { importFile.click(); });
+
+            importFile.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const importedData = JSON.parse(event.target.result);
+                        if (typeof importedData === 'object' && importedData !== null) {
+                            appData = importedData; 
+                            localStorage.setItem(DB_KEY, JSON.stringify(appData));
+                            syncToCloud();
+                            renderCalendar(); 
+                            alert("Mantap! Data berhasil direstore.");
+                        } else {
+                            alert("Format file tidak didukung!");
+                        }
+                    } catch (error) {
+                        alert("Gagal membaca file!");
+                    }
+                };
+                reader.readAsText(file);
+                importFile.value = ''; 
+            });
+
+            // --- PENCARIAN & FILTER --- //
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            let currentFilter = 'All';
+
+            function applyFilter() {
+                const searchValue = searchInput.value.toLowerCase();
+                const cards = document.querySelectorAll('.schedule-item');
+                
+                cards.forEach(card => {
+                    const cat = card.getAttribute('data-category');
+                    const cardText = card.querySelector('.item-header').innerText.toLowerCase();
+                    
+                    const matchesCategory = (currentFilter === 'All' || cat === currentFilter);
+                    const matchesSearch = cardText.includes(searchValue);
+
+                    if (matchesCategory && matchesSearch) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active'); 
+                    currentFilter = btn.getAttribute('data-filter');
+                    applyFilter();
+                });
+            });
+
+            searchInput.addEventListener('input', applyFilter);
+            monthSelect.addEventListener('change', renderCalendar);
+            yearInput.addEventListener('change', renderCalendar);
+
+            // --- TEMA GELAP / TERANG --- //
+            const btnTheme = document.getElementById('themeToggle');
+            
+            function updateThemeBtn() {
+                if (document.body.classList.contains('dark-mode')) {
+                    btnTheme.innerHTML = '<span id="t-icon" class="nav-icon" style="filter:none; font-size:1rem; margin-right:4px;">☀️</span> TERANG';
+                } else {
+                    btnTheme.innerHTML = '<span id="t-icon" class="nav-icon" style="filter:none; font-size:1rem; margin-right:4px;">🌙</span> GELAP';
+                }
+            }
+
+            if (localStorage.getItem('app_theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+                updateThemeBtn();
+            }
+
+            btnTheme.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                updateThemeBtn();
+                localStorage.setItem('app_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            });
+
+            // Render langsung tanpa menunggu internet macet
+            renderCalendar();
+        });
+    </script>
+</body>
+</html>
